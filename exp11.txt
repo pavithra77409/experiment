@@ -1,0 +1,56 @@
+import pandas as pd 
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+import plotly.express as px
+import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
+df=pd.read_csv('Iris.csv')
+df.head()
+df.shape
+df=df.drop(columns=['Id'])
+df.head()
+df.info()
+df.describe()
+df.info()
+df['Species'].value_counts()
+df.isna().sum()
+df['SepalLengthCm'].hist()
+df['SepalWidthCm'].hist()
+from sklearn.preprocessing import LabelEncoder
+le=LabelEncoder()
+df['Species']=le.fit_transform(df['Species'])
+df.head()
+
+corr=df.corr()
+fig,ax=plt.subplots(figsize=(5,4))
+sns.heatmap(corr,annot=True,ax=ax,cmap='coolwarm')
+px.scatter(df,x='Species',y='PetalWidthCm')
+px.line(df,x='Species',y='PetalWidthCm')
+px.scatter(df,x='Species',y='PetalLengthCm')
+px.scatter(df,x='Species',y='SepalLengthCm')
+px.scatter(df,x='Species',y='SepalWidthCm')
+px.scatter_matrix(df,color='Species',title='Iris',dimensions=['SepalLengthCm','SepalWidthCm','PetalLengthCm','PetalWidthCm'])
+color=['red','orange','blue']
+species=['Iris-virginica','Iris-versicolor','Iris-setosa']
+for i in range(3):
+    x=df[df['Species']==species[i]]
+    plt.scatter(x['PetalLengthCm'],x['PetalWidthCm'],color=color[i],label=species[i])
+plt.xlabel('SepalLength')
+plt.ylabel('SepalWidth')
+plt.legend()
+
+from sklearn.model_selection import train_test_split
+x=df.drop(columns=['Species'])
+y=df['Species']
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.30)
+from sklearn.linear_model import LogisticRegression
+model=LogisticRegression()
+model.fit(x_train,y_train)
+print("Accuracy:",model.score(x_test,y_test)*100)
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report,f1_score
+model=DecisionTreeClassifier()
+model.fit(x_train,y_train)
+print("Accuracy:",model.score(x_test,y_test)*100)
